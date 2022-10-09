@@ -1,0 +1,14 @@
+#app
+uvicorn==0.17.6
+fastapi==0.78.0
+mypy==0.950
+pydantic==1.9.1
+pytest==7.1.2
+
+#auth
+pyjwt
+passlib[bcrypt]
+
+#database
+alembic==1.7.7
+sqlalchemy[mypy]
