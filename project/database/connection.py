@@ -1,15 +1,10 @@
-import os
-
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-SQLALCHEMY_DATABASE_URL = os.environ["SQLALCHEMY_DATABASE_URL"]
+def create_database_engine(db_url):
+    return create_engine(url=db_url)
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+def create_session_factory(db_engine) -> sessionmaker:
+    return sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
