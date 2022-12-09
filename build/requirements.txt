@@ -1,7 +1,6 @@
 #app
 fastapi==0.78.0
 pydantic==1.9.1
-mypy==0.950
 pytest==7.1.2
 uvicorn==0.17.6
 python-multipart
@@ -12,5 +11,5 @@ passlib[bcrypt]
 
 #database
 alembic==1.7.7
+SQLAlchemy==1.4.44
 psycopg2==2.9.3
-sqlalchemy[mypy]

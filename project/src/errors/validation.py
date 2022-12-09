@@ -1,0 +1,2 @@
+class IncorrectDataError(ValueError):
+    pass

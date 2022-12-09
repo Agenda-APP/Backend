@@ -1,17 +1,21 @@
 from fastapi import status
-from sqlalchemy.sql import exists
+from sqlalchemy import exists
 
 from database.models.user import Profile
 
 
 def test_sign_up(client, session, photo):
     user = {"email": "test@mail.com", "password": "12345", "name": "Jim"}
-    response = client.post(url="/authorization/signup",
-                           data=user,
-                           files={"photo": ("photo.png", photo, "image/png")})
-    user_exists = session.query(exists().where(Profile.email == "test@mail.com")).scalar()
+    response = client.post(
+        url="/authorization/signup",
+        data=user,
+        files={"photo": ("photo.png", photo, "image/png")},
+    )
+    user_exists = session.query(
+        exists().where(Profile.email == "test@mail.com")
+    ).scalar()
     assert response.status_code == status.HTTP_201_CREATED
-    assert user_exists is True
+    assert user_exists
 
 
 def test_sign_up_with_already_existent_email(client):
@@ -20,7 +24,7 @@ def test_sign_up_with_already_existent_email(client):
     response = client.post(url="/authorization/signup", data=user)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert len(response.json()) == 1
-    assert 'detail' in response.json()
+    assert "detail" in response.json()
 
 
 def test_login(client):
@@ -37,4 +41,3 @@ def test_login_with_non_existent_email(client):
     response = client.post(url="/authorization/login", json=user)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert "access_token" not in response.json()
-

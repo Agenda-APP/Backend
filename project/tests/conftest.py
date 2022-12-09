@@ -1,14 +1,14 @@
 import os
 
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from database.models import base
 from database.dependency import get_database_session_factory
-from src.endpoints.authorization import router
+from database.models import base
+from src.handlers import authorization, category, task
 
 
 @pytest.fixture(scope="session")
@@ -19,7 +19,7 @@ def engine():
     engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def tables(engine):
     base.Base.metadata.create_all(bind=engine)
     yield
@@ -38,8 +38,12 @@ def session(engine, tables):
 @pytest.fixture
 def app(session):
     app = FastAPI()
-    app.include_router(router)
-    app.dependency_overrides[get_database_session_factory] = lambda: lambda: session
+    app.include_router(authorization.router)
+    app.include_router(task.router)
+    app.include_router(category.router)
+    app.dependency_overrides[
+        get_database_session_factory
+    ] = lambda: lambda: session
     return app
 
 
@@ -51,5 +55,13 @@ def client(app):
 
 @pytest.fixture
 def photo():
-    with open("tests/profile.png", 'rb') as f:
+    with open("tests/profile.png", "rb") as f:
         return f.read()
+
+
+@pytest.fixture
+def created_category(client):
+    new_category = {"name": "Недельные"}
+    res = client.post(url="/category/create", json=new_category)
+    print(res.json())
+    return res.json()
