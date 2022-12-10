@@ -62,6 +62,5 @@ def photo():
 @pytest.fixture
 def created_category(client):
     new_category = {"name": "Недельные"}
-    res = client.post(url="/category/create", json=new_category)
-    print(res.json())
-    return res.json()
+    response = client.post(url="/category/create", json=new_category)
+    return response.json()
