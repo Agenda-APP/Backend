@@ -15,7 +15,7 @@ class CategoryRepository(AbstractRepository):
         self.session.commit()
 
     def get_id_of_category(self, name: str) -> int | None:
-        query = sqlalchemy.select(task.Category.id).filter(
+        query = sqlalchemy.select(task.Category.id).where(
             task.Category.name == name
         )
         return self.session.execute(query).scalar()

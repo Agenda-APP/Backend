@@ -11,7 +11,7 @@ class UserRepository(AbstractRepository):
         super().__init__(session)
 
     def get_user_by_email(self, email: str) -> user.Profile | None:
-        query = sqlalchemy.select(user.Profile).filter(
+        query = sqlalchemy.select(user.Profile).where(
             user.Profile.email == email
         )
         return self.session.execute(query).scalar()

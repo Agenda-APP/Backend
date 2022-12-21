@@ -32,7 +32,7 @@ class TaskRepository(AbstractRepository):
         self.session.commit()
 
     def delete_task(self, description: str) -> None:
-        query = sqlalchemy.delete(task.Task).filter(
+        query = sqlalchemy.delete(task.Task).where(
             task.Task.description == description
         )
         self.session.execute(query)
