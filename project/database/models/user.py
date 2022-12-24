@@ -1,10 +1,10 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer, String
 
 from database.models.base import Base
 
 
 class Profile(Base):
-    __tablename__ = "profile"
+    __tablename__ = "profiles"
 
     id: int = Column(Integer, primary_key=True)
     email: str = Column(String(120), unique=True)

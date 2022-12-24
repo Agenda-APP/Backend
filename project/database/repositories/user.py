@@ -1,26 +1,27 @@
+import sqlalchemy
 from sqlalchemy.orm import Session
 
 from database.models import user
 from src.classes.authorization import Authorization
-from .repository import Repository
+from .repository import AbstractRepository
 
 
-class UserRepository(Repository):
+class UserRepository(AbstractRepository):
     def __init__(self, session: Session):
         super().__init__(session)
 
     def get_user_by_email(self, email: str) -> user.Profile | None:
-        current_user = (self.session.query(user.Profile)
-                        .filter(user.Profile.email == email)
-                        .first())
-        return current_user
+        query = sqlalchemy.select(user.Profile).where(
+            user.Profile.email == email
+        )
+        return self.session.execute(query).scalar()
 
-    def create_user(self, email: str, password: str,
-                    name: str, photo: str | None = None) -> user.Profile | None:
+    def create_user(
+        self, email: str, password: str, name: str, photo: str | None = None
+    ) -> None:
         hashed_password = Authorization().get_hashed_password(password)
-        created_user = user.Profile(email=email, password=hashed_password,
-                                    name=name, photo=photo)
-        self.session.add(created_user)
+        query = sqlalchemy.insert(user.Profile).values(
+            email=email, password=hashed_password, name=name, photo=photo
+        )
+        self.session.execute(query)
         self.session.commit()
-        self.session.refresh(created_user)
-        return created_user
