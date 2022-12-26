@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import sqlalchemy
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from database.models import task
 from src.enumerations import Priority, Status
@@ -13,17 +13,18 @@ class TaskRepository(AbstractRepository):
         super().__init__(session)
 
     def create_task(
-        self,
-        description: str,
-        category: int | None,
-        status: Status,
-        priority: Priority,
-        end_date: datetime,
+            self,
+            user_id: int,
+            description: str,
+            category_id: int | None,
+            status: Status,
+            priority: Priority,
+            end_date: datetime,
     ) -> None:
-
         query = sqlalchemy.insert(task.Task).values(
+            user_id=user_id,
             description=description,
-            category=category,
+            category_id=category_id,
             status=status,
             priority=priority,
             end_date=end_date,
@@ -37,3 +38,22 @@ class TaskRepository(AbstractRepository):
         )
         self.session.execute(query)
         self.session.commit()
+
+    def update_task(
+            self, task_id, category_id: int, existing_task: task.Task
+    ) -> task.Task:
+        query = (
+            sqlalchemy.update(task.Task).where(task.Task.id == task_id).values(
+                description=existing_task.description,
+                category_id=category_id,
+                status=existing_task.status,
+                priority=existing_task.priority,
+                end_date=existing_task.end_date,
+            )
+        )
+        self.session.execute(query)
+        self.session.commit()
+        updated = (self.session.execute(
+            sqlalchemy.select(task.Task).where(task.Task.id == task_id).options(joinedload(task.Task.category))
+        ).scalar())
+        return updated

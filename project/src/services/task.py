@@ -17,6 +17,7 @@ class TaskService:
 
     def create_new_task(
         self,
+        user_id: int,
         description: str,
         end_date: datetime,
         category: str,
@@ -28,12 +29,24 @@ class TaskService:
             if category_id is None:
                 raise DoesNotExistsError
             self.task_repository.create_task(
+                user_id=user_id,
                 description=description,
                 end_date=end_date,
-                category=category_id,
+                category_id=category_id,
                 priority=priority,
                 status=status,
             )
 
     def delete_existing_task(self, description: str) -> None:
         self.task_repository.delete_task(description=description)
+
+    def update_existing_task(
+            self, task_id: int, task
+    ):
+        category_id = self.category_repository.get_id_of_category(
+            task.category.name
+        )
+        updated_task = self.task_repository.update_task(
+            task_id=task_id, category_id=category_id, existing_task=task
+        )
+        return updated_task

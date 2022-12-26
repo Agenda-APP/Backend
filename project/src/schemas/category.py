@@ -7,3 +7,10 @@ class CategoryCreation(BaseModel):
 
 class CategoryDeletion(BaseModel):
     name: str
+
+
+class Category(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True

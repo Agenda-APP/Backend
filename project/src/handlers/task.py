@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.dependency import get_database_session
 from database.repositories.category import CategoryRepository
 from database.repositories.task import TaskRepository
-from src.schemas.task import TaskCreation, TaskDeletion
+from src.schemas.task import TaskCreation, TaskDeletion, TaskUpdate, TasksRead
 from src.services.task import TaskService
 from src.errors import existence
 
@@ -20,6 +20,7 @@ def create_task(
     category_repo = CategoryRepository(session)
     try:
         TaskService(task_repo, category_repo).create_new_task(
+            user_id=task.user_id,
             description=task.description,
             end_date=task.end_date,
             category=task.category,
@@ -41,3 +42,16 @@ def delete_task(
     task_repo = TaskRepository(session)
     TaskService(task_repo).delete_existing_task(description=task.description)
     return {"message": "Task has been deleted"}
+
+
+@router.put("/update/{task_id}", response_model=TasksRead)
+def update_task(
+    task_id: int,
+    task: TaskUpdate,
+    session: Session = Depends(get_database_session),
+):
+    updated_task = TaskService(TaskRepository(session),
+                      CategoryRepository(session)).update_existing_task(
+        task_id, task
+    )
+    return updated_task
