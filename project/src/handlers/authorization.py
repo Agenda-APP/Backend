@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
-from sqlalchemy.orm import Session
 
-from database.dependency import get_database_session
-from database.repositories.user import UserRepository
+from src import providers
 from src.errors import existence, validation
 from src.schemas.auth import LoginDetails, SignUpDetails, Token
 from src.services.auth import AuthService
@@ -21,31 +19,27 @@ def signup(
     password: str = Form(),
     name: str = Form(),
     photo: None | UploadFile = None,
-    session: Session = Depends(get_database_session),
+    auth_service: AuthService = Depends(providers.auth_service_provider),
 ):
     try:
-        response = AuthService(UserRepository(session)).register_user(
-            email, photo, name, password
-        )
-        return response
+        response = auth_service.register_user(email, photo, name, password)
     except existence.AlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The email already exists",
         )
+    return response
 
 
 @router.post(
     "/login", response_model=Token, status_code=status.HTTP_201_CREATED
 )
 def login(
-    user: LoginDetails, session: Session = Depends(get_database_session)
+    user: LoginDetails,
+    auth_service: AuthService = Depends(providers.auth_service_provider),
 ):
     try:
-        response = AuthService(UserRepository(session)).login_user(
-            user.email, user.password
-        )
-        return response
+        response = auth_service.login_user(user.email, user.password)
     except existence.DoesNotExistError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -57,3 +51,4 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
+    return response

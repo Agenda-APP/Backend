@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from src.enumerations import Status, Priority
+from src.enumerations import Priority, Status
 
 
 @dataclass

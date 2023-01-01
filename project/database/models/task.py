@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from database.models.base import Base
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import Mapped, relationship
+
+from database.models.base import Base
 from src.enumerations import Priority, Status
 
 

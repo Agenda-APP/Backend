@@ -1,4 +1,5 @@
 import sqlalchemy.exc
+
 from database.repositories.category import CategoryRepository
 from src.errors import existence
 
@@ -13,5 +14,7 @@ class CategoryService:
         except sqlalchemy.exc.IntegrityError:
             raise existence.AlreadyExistsError
 
-    def delete_existing_category(self, category: str) -> None:
-        self.category_repository.delete_category(category=category)
+    def delete_existing_category(self, category_id: int) -> None:
+        if not self.category_repository.is_exist(category_id=category_id):
+            raise existence.DoesNotExistError
+        self.category_repository.delete_category(category_id=category_id)

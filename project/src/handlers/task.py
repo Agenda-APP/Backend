@@ -1,13 +1,10 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from database.dependency import get_database_session
-from database.repositories.category import CategoryRepository
-from database.repositories.task import TaskRepository
-from src.schemas.task import TaskCreation, TaskUpdate, TasksRead
-from src.services.task import TaskService
+from src import providers
+from src.dto.task import CategoryDTO, TaskDTO
 from src.errors import existence
-from src.dto.task import TaskDTO, CategoryDTO
+from src.schemas.task import TaskCreation, TasksRead, TaskUpdate
+from src.services.task import TaskService
 
 
 router = APIRouter(prefix="/task", tags=["task"])
@@ -17,12 +14,11 @@ router = APIRouter(prefix="/task", tags=["task"])
     "/create", status_code=status.HTTP_201_CREATED, response_model=TaskCreation
 )
 def create_task(
-    task: TaskCreation, session: Session = Depends(get_database_session)
+    task: TaskCreation,
+    task_service: TaskService = Depends(providers.task_service_provider),
 ):
     try:
-        TaskService(
-            TaskRepository(session), CategoryRepository(session)
-        ).create_new_task(
+        task_service.create_new_task(
             TaskDTO(
                 status=task.status,
                 end_date=task.end_date,
@@ -41,9 +37,16 @@ def create_task(
 
 @router.delete("/delete/{task_id}", status_code=status.HTTP_200_OK)
 def delete_task(
-    task_id: int, session: Session = Depends(get_database_session)
+    task_id: int,
+    task_service: TaskService = Depends(providers.task_service_provider),
 ):
-    TaskService(TaskRepository(session)).delete_existing_task(task_id=task_id)
+    try:
+        task_service.delete_existing_task(task_id=task_id)
+    except existence.DoesNotExistError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task does not exist",
+        )
     return {"message": "Task has been deleted"}
 
 
@@ -55,11 +58,9 @@ def delete_task(
 def update_task(
     task_id: int,
     task: TaskUpdate,
-    session: Session = Depends(get_database_session),
+    task_service: TaskService = Depends(providers.task_service_provider),
 ):
-    updated_task = TaskService(
-        TaskRepository(session), CategoryRepository(session)
-    ).update_existing_task(
+    updated_task = task_service.update_existing_task(
         task_id,
         TaskDTO(
             status=task.status,

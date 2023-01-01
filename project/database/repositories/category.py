@@ -1,17 +1,17 @@
 import sqlalchemy
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import exists
 
 from database.models import task
-from .repository import AbstractRepository
-
 from src.dto.task import CategoryDTO
+from .repository import AbstractRepository
 
 
 class CategoryRepository(AbstractRepository):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def create_category(self, name) -> None:
+    def create_category(self, name: str) -> None:
         query = sqlalchemy.insert(task.Category).values(name=name)
         self.session.execute(query)
         self.session.commit()
@@ -22,10 +22,15 @@ class CategoryRepository(AbstractRepository):
         )
         return self.session.execute(query).scalar()
 
-    def delete_category(self, category: str) -> None:
+    def delete_category(self, category_id: int) -> None:
         self.session.execute(
             sqlalchemy.delete(task.Category).where(
-                task.Category.name == category
+                task.Category.id == category_id
             )
         )
         self.session.commit()
+
+    def is_exist(self, category_id: int) -> bool:
+        return self.session.query(
+            exists().where(task.Category.id == category_id)
+        ).scalar()

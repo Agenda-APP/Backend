@@ -1,15 +1,17 @@
+from database.models import task
 from database.repositories.category import CategoryRepository
 from database.repositories.task import TaskRepository
-from database.models import task
-from src.errors.existence import DoesNotExistError
 from src.dto.task import TaskDTO
+from src.errors.existence import DoesNotExistError
+
+from src.errors import existence
 
 
 class TaskService:
     def __init__(
         self,
         task_repository: TaskRepository,
-        category_repository: CategoryRepository | None = None,
+        category_repository: CategoryRepository,
     ):
         self.task_repository = task_repository
         self.category_repository = category_repository
@@ -22,15 +24,13 @@ class TaskService:
             if category_id is None:
                 raise DoesNotExistError
             self.task_repository.create_task(
-                user_id=task_dto.user_id,
-                description=task_dto.description,
-                end_date=task_dto.end_date,
+                task_dto,
                 category_id=category_id,
-                priority=task_dto.priority,
-                status=task_dto.status,
             )
 
     def delete_existing_task(self, task_id: int) -> None:
+        if not self.task_repository.is_exists(task_id=task_id):
+            raise existence.DoesNotExistError
         self.task_repository.delete_task(task_id=task_id)
 
     def update_existing_task(
