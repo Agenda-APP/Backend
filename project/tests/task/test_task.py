@@ -7,6 +7,7 @@ from database.models.task import Task
 def test_create_task(client, session):
     client.post(url="/category/create", json={"name": "Еженедельные"})
     daily = {
+        "user_id": 1,
         "description": "Пойти в магазин",
         "category": "Еженедельные",
         "status": "Создано",
@@ -28,7 +29,10 @@ def test_delete_task(client, session):
         "end_date": "2022-11-04T13:28:08.464Z",
     }
     client.post(url="/task/create", json=task)
-    task_deletion_info = {"description": task.get("description")}
-    response = client.delete(url="/task/delete", json=task_deletion_info)
+    response = client.delete(url="/task/delete/1")
     assert response.status_code == status.HTTP_200_OK
     assert session.query(func.count(Task.description)).scalar() == 0
+
+
+def test_update_task(client, session):
+    pass

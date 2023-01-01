@@ -37,7 +37,7 @@ class AuthService:
         auth = Authorization()
         user_from_db = self.repository.get_user_by_email(email=email)
         if user_from_db is None:
-            raise existence.DoesNotExistsError
+            raise existence.DoesNotExistError
         verified_password = auth.verify_password(
             password, user_from_db.password
         )

@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from database.models import task
 from .repository import AbstractRepository
 
+from src.dto.task import CategoryDTO
+
 
 class CategoryRepository(AbstractRepository):
     def __init__(self, session: Session):
@@ -14,7 +16,7 @@ class CategoryRepository(AbstractRepository):
         self.session.execute(query)
         self.session.commit()
 
-    def get_id_of_category(self, name: str) -> int | None:
+    def get_id_of_category(self, name: str | CategoryDTO) -> int | None:
         query = sqlalchemy.select(task.Category.id).where(
             task.Category.name == name
         )

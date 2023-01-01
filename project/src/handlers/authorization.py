@@ -46,7 +46,7 @@ def login(
             user.email, user.password
         )
         return response
-    except existence.DoesNotExistsError:
+    except existence.DoesNotExistError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User does not exist",

@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -16,13 +15,9 @@ class TaskCreation(BaseModel):
     end_date: datetime
 
 
-class TaskDeletion(BaseModel):
-    description: str
-
-
 class TasksRead(BaseModel):
     id: int
-    user_id: int
+    user_id: int | None
     status: Status
     end_date: datetime
     description: str
@@ -34,8 +29,8 @@ class TasksRead(BaseModel):
 
 
 class TaskUpdate(BaseModel):
-    status: Optional[Status]
-    end_date: Optional[datetime]
-    description: Optional[str]
-    category: Optional[Category]
-    priority: Optional[Priority]
+    status: Status
+    end_date: datetime
+    description: str
+    category: Category
+    priority: Priority

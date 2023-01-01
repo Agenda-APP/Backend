@@ -1,9 +1,8 @@
-from datetime import datetime
-
 from database.repositories.category import CategoryRepository
 from database.repositories.task import TaskRepository
-from src import enumerations
-from src.errors.existence import DoesNotExistsError
+from database.models import task
+from src.errors.existence import DoesNotExistError
+from src.dto.task import TaskDTO
 
 
 class TaskService:
@@ -15,38 +14,36 @@ class TaskService:
         self.task_repository = task_repository
         self.category_repository = category_repository
 
-    def create_new_task(
-        self,
-        user_id: int,
-        description: str,
-        end_date: datetime,
-        category: str,
-        priority: enumerations.Priority,
-        status: enumerations.Status,
-    ) -> None:
+    def create_new_task(self, task_dto: TaskDTO) -> None:
         if self.category_repository is not None:
-            category_id = self.category_repository.get_id_of_category(category)
+            category_id = self.category_repository.get_id_of_category(
+                task_dto.category.name
+            )
             if category_id is None:
-                raise DoesNotExistsError
+                raise DoesNotExistError
             self.task_repository.create_task(
-                user_id=user_id,
-                description=description,
-                end_date=end_date,
+                user_id=task_dto.user_id,
+                description=task_dto.description,
+                end_date=task_dto.end_date,
                 category_id=category_id,
-                priority=priority,
-                status=status,
+                priority=task_dto.priority,
+                status=task_dto.status,
             )
 
-    def delete_existing_task(self, description: str) -> None:
-        self.task_repository.delete_task(description=description)
+    def delete_existing_task(self, task_id: int) -> None:
+        self.task_repository.delete_task(task_id=task_id)
 
     def update_existing_task(
-            self, task_id: int, task
-    ):
-        category_id = self.category_repository.get_id_of_category(
-            task.category.name
-        )
-        updated_task = self.task_repository.update_task(
-            task_id=task_id, category_id=category_id, existing_task=task
-        )
-        return updated_task
+        self, task_id: int, task_dto: TaskDTO
+    ) -> task.Task | None:
+        if self.category_repository is not None:
+            category_id = self.category_repository.get_id_of_category(
+                task_dto.category.name
+            )
+            updated_task = self.task_repository.update_task(
+                task_id=task_id,
+                category_id=category_id,
+                existing_task=task_dto,
+            )
+            return updated_task
+        return None
