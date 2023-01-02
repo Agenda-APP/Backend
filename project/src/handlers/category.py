@@ -3,12 +3,11 @@ from fastapi.exceptions import HTTPException
 
 from src import providers
 from src.errors import existence
-from src.errors.existence import AlreadyExistsError
 from src.schemas.category import CategoryCreation
 from src.services.category import CategoryService
 
 
-router = APIRouter(prefix="/category", tags=["category"])
+router = APIRouter(prefix="/api/category", tags=["category"])
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -20,12 +19,12 @@ def create_category(
 ):
     try:
         category_service.create_new_category(category=category.name)
-    except AlreadyExistsError:
+    except existence.AlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Category already exists",
         )
-    return {"message": "Category has been created"}
+    return {"message": "Category has been created", **category.dict()}
 
 
 @router.delete("/delete/{category_id}", status_code=status.HTTP_200_OK)

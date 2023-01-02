@@ -7,7 +7,7 @@ from src.schemas.task import TaskCreation, TasksRead, TaskUpdate
 from src.services.task import TaskService
 
 
-router = APIRouter(prefix="/task", tags=["task"])
+router = APIRouter(prefix="/api/task", tags=["task"])
 
 
 @router.post(

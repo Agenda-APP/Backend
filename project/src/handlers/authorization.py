@@ -6,7 +6,7 @@ from src.schemas.auth import LoginDetails, SignUpDetails, Token
 from src.services.auth import AuthService
 
 
-router = APIRouter(prefix="/authorization", tags=["auth"])
+router = APIRouter(prefix="/api/authorization", tags=["auth"])
 
 
 @router.post(

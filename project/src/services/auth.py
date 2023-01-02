@@ -2,7 +2,7 @@ from fastapi import UploadFile
 
 import utilities
 from database.repositories.user import UserRepository
-from src.classes.authorization import Authorization
+from src.domain.authorization import Authorization
 from src.errors import existence, validation
 
 

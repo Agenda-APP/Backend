@@ -2,8 +2,6 @@ from database.models import task
 from database.repositories.category import CategoryRepository
 from database.repositories.task import TaskRepository
 from src.dto.task import TaskDTO
-from src.errors.existence import DoesNotExistError
-
 from src.errors import existence
 
 
@@ -22,7 +20,7 @@ class TaskService:
                 task_dto.category.name
             )
             if category_id is None:
-                raise DoesNotExistError
+                raise existence.DoesNotExistError
             self.task_repository.create_task(
                 task_dto,
                 category_id=category_id,
