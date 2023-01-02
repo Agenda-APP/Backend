@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 
 from database.models import user
-from src.classes.authorization import Authorization
+from src.domain.authorization import Authorization
 from .repository import AbstractRepository
 
 

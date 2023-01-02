@@ -1,40 +1,44 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
-from sqlalchemy.orm import Session
 
-from database.dependency import get_database_session
-from database.repositories.category import CategoryRepository
-from src.errors.existence import AlreadyExistsError
-from src.schemas.category import CategoryCreation, CategoryDeletion
+from src import providers
+from src.errors import existence
+from src.schemas.category import CategoryCreation
 from src.services.category import CategoryService
 
 
-router = APIRouter(prefix="/category", tags=["category"])
+router = APIRouter(prefix="/api/category", tags=["category"])
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 def create_category(
     category: CategoryCreation,
-    session: Session = Depends(get_database_session),
+    category_service: CategoryService = Depends(
+        providers.category_service_provider
+    ),
 ):
     try:
-        CategoryService(CategoryRepository(session)).create_new_category(
-            category=category.name
-        )
-    except AlreadyExistsError:
+        category_service.create_new_category(category=category.name)
+    except existence.AlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Category already exists",
         )
-    return {"message": "Category has been created"}
+    return {"message": "Category has been created", **category.dict()}
 
 
-@router.delete("/delete", status_code=status.HTTP_200_OK)
+@router.delete("/delete/{category_id}", status_code=status.HTTP_200_OK)
 def delete_category(
-    category: CategoryDeletion,
-    session: Session = Depends(get_database_session),
+    category_id: int,
+    category_service: CategoryService = Depends(
+        providers.category_service_provider
+    ),
 ):
-    CategoryService(CategoryRepository(session)).delete_existing_category(
-        category=category.name
-    )
+    try:
+        category_service.delete_existing_category(category_id=category_id)
+    except existence.DoesNotExistError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category does not exist",
+        )
     return {"message": "Category has been deleted"}

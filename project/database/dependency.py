@@ -1,7 +1,7 @@
-from typing import NoReturn, Iterator
+from typing import Iterator, NoReturn
 
 from fastapi import Depends
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 
 def get_database_session_factory() -> NoReturn:

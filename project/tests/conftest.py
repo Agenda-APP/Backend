@@ -61,6 +61,20 @@ def photo():
 
 @pytest.fixture
 def created_category(client):
-    new_category = {"name": "Недельные"}
-    response = client.post(url="/category/create", json=new_category)
-    return response.json()
+    new_category = {"name": "Основные"}
+    response = client.post(url="api/category/create", json=new_category)
+    return response
+
+
+@pytest.fixture
+def daily_task(client):
+    daily = {
+        "user_id": 1,
+        "description": "Пойти в магазин",
+        "category": "Основные",
+        "status": "Создано",
+        "priority": "Срочно сделать",
+        "end_date": "2022-12-03T16:28:08.464Z",
+    }
+    response = client.post(url="api/task/create", json=daily)
+    return response

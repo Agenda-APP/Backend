@@ -1,7 +1,8 @@
+from fastapi import UploadFile
+
 import utilities
 from database.repositories.user import UserRepository
-from fastapi import UploadFile
-from src.classes.authorization import Authorization
+from src.domain.authorization import Authorization
 from src.errors import existence, validation
 
 
@@ -37,7 +38,7 @@ class AuthService:
         auth = Authorization()
         user_from_db = self.repository.get_user_by_email(email=email)
         if user_from_db is None:
-            raise existence.DoesNotExistsError
+            raise existence.DoesNotExistError
         verified_password = auth.verify_password(
             password, user_from_db.password
         )

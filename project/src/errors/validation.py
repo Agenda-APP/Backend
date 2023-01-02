@@ -1,2 +1,2 @@
-class IncorrectDataError(ValueError):
+class IncorrectDataError(Exception):
     pass

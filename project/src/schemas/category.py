@@ -5,5 +5,8 @@ class CategoryCreation(BaseModel):
     name: str
 
 
-class CategoryDeletion(BaseModel):
+class Category(BaseModel):
     name: str
+
+    class Config:
+        orm_mode = True
