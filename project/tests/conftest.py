@@ -6,9 +6,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from src.business_logic.errors import existence, validation
+from src.business_logic import handlers
+from src.controllers import authorization, category, task
 from src.database.dependency import get_database_session_factory
 from src.database.models import base
-from src.controllers import authorization, category, task
 
 
 @pytest.fixture(scope="session")
@@ -44,6 +46,15 @@ def app(session):
     app.dependency_overrides[
         get_database_session_factory
     ] = lambda: lambda: session
+    app.add_exception_handler(
+        existence.AlreadyExistsError, handlers.already_exists_handler
+    )
+    app.add_exception_handler(
+        existence.DoesNotExistError, handlers.does_not_exist_handler
+    )
+    app.add_exception_handler(
+        validation.IncorrectDataError, handlers.incorrect_data_handler
+    )
     return app
 
 

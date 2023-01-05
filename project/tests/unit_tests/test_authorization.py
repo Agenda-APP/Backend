@@ -24,13 +24,14 @@ def test_sign_up_with_already_existent_email(client):
     response = client.post(url="api/authorization/signup", data=user)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert len(response.json()) == 1
-    assert "detail" in response.json()
+    assert "message" in response.json()
 
 
 def test_login(client):
     user = {"email": "test@mail.com", "password": "12345", "name": "John"}
-    client.post(url="api/authorization/signup", data=user)
-    response = client.post(url="api/authorization/login", json=user)
+    r = client.post(url="api/authorization/signup", data=user)
+    response = client.post(url="api/authorization/login",
+                           json={"email": "test@mail.com", "password": "12345"})
     assert response.status_code == status.HTTP_201_CREATED
     assert len(response.json()) == 3
     assert "access_token" in response.json()
