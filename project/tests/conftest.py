@@ -6,9 +6,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from database.dependency import get_database_session_factory
-from database.models import base
-from src.handlers import authorization, category, task
+from src.database.dependency import get_database_session_factory
+from src.database.models import base
+from src.controllers import authorization, category, task
 
 
 @pytest.fixture(scope="session")

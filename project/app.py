@@ -3,10 +3,10 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from database.dependency import get_database_session_factory
-from database.provider import DatabaseProvider
-from src import providers
-from src.handlers import authorization, category, task
+from src.database.dependency import get_database_session_factory
+from src.database.provider import DatabaseProvider
+from src.business_logic import providers
+from src.controllers import authorization, category, task
 
 
 def configure_database(app: FastAPI) -> None:
@@ -26,7 +26,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Task Book", description="Convenient task management service"
     )
-    app.mount("/static", StaticFiles(directory="static"), name="static")
+    app.mount("/static", StaticFiles(directory="src/static"), name="static")
     app.dependency_overrides[
         providers.task_service_factory
     ] = providers.task_service_provider
