@@ -3,10 +3,12 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.database.dependency import get_database_session_factory
-from src.database.provider import DatabaseProvider
+from src.business_logic import handlers
+from src.business_logic.errors import existence, validation
 from src.business_logic import providers
 from src.controllers import authorization, category, task
+from src.database.dependency import get_database_session_factory
+from src.database.provider import DatabaseProvider
 
 
 def configure_database(app: FastAPI) -> None:
@@ -36,6 +38,15 @@ def create_app() -> FastAPI:
     app.dependency_overrides[
         providers.auth_service_factory
     ] = providers.auth_service_provider
+    app.add_exception_handler(
+        existence.AlreadyExistsError, handlers.already_exists_handler
+    )
+    app.add_exception_handler(
+        existence.DoesNotExistError, handlers.does_not_exist_handler
+    )
+    app.add_exception_handler(
+        validation.IncorrectDataError, handlers.incorrect_data_handler
+    )
     configure_database(app)
     configure_routes(app)
     return app

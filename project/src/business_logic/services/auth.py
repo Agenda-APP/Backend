@@ -16,7 +16,7 @@ class AuthService:
     ) -> dict:
         user_from_db = self.repository.get_user_by_email(email=email)
         if user_from_db:
-            raise existence.AlreadyExistsError
+            raise existence.AlreadyExistsError("Such user already exists")
         if photo is not None:
             photo_url = utilities.save_photo(photo)
             self.repository.create_user(
@@ -39,12 +39,12 @@ class AuthService:
         auth = Authorization()
         user_from_db = self.repository.get_user_by_email(email=email)
         if user_from_db is None:
-            raise existence.DoesNotExistError
+            raise existence.DoesNotExistError("User does not exist")
         verified_password = auth.verify_password(
             password, user_from_db.password
         )
         if not verified_password:
-            raise validation.IncorrectDataError
+            raise validation.IncorrectDataError("Incorrect email or password")
         access_token = auth.create_access_token(email)
         return {
             "message": "login successfully",

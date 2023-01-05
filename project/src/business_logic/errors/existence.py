@@ -1,6 +1,8 @@
 class AlreadyExistsError(Exception):
-    pass
+    def __init__(self, message: str):
+        self.message = message
 
 
 class DoesNotExistError(Exception):
-    pass
+    def __init__(self, message: str):
+        self.message = message

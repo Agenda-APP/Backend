@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, status
-from fastapi.exceptions import HTTPException
 
 from src.business_logic import providers
-from src.business_logic.errors import existence
 from src.business_logic.schemas.category import CategoryCreation
 from src.business_logic.services.category import CategoryService
 
@@ -17,13 +15,7 @@ def create_category(
         providers.category_service_provider
     ),
 ):
-    try:
-        category_service.create_new_category(category=category.name)
-    except existence.AlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Category already exists",
-        )
+    category_service.create_new_category(category=category.name)
     return {"message": "Category has been created", **category.dict()}
 
 
@@ -34,11 +26,5 @@ def delete_category(
         providers.category_service_provider
     ),
 ):
-    try:
-        category_service.delete_existing_category(category_id=category_id)
-    except existence.DoesNotExistError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category does not exist",
-        )
+    category_service.delete_existing_category(category_id=category_id)
     return {"message": "Category has been deleted"}

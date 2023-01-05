@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from src.business_logic import providers
 from src.business_logic.dto.task import CategoryDTO, TaskDTO
-from src.business_logic.errors import existence
 from src.business_logic.schemas.task import TaskCreation, TasksRead, TaskUpdate
 from src.business_logic.services.task import TaskService
 
@@ -17,22 +16,16 @@ def create_task(
     task: TaskCreation,
     task_service: TaskService = Depends(providers.task_service_provider),
 ):
-    try:
-        task_service.create_new_task(
-            TaskDTO(
-                status=task.status,
-                end_date=task.end_date,
-                description=task.description,
-                category=CategoryDTO(task.category),
-                priority=task.priority,
-            )
+    task_service.create_new_task(
+        TaskDTO(
+            status=task.status,
+            end_date=task.end_date,
+            description=task.description,
+            category=CategoryDTO(task.category),
+            priority=task.priority,
         )
-    except existence.DoesNotExistError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category does not exist",
-        )
-    return {**task.dict()}
+    )
+    return task
 
 
 @router.delete("/delete/{task_id}", status_code=status.HTTP_200_OK)
@@ -40,13 +33,7 @@ def delete_task(
     task_id: int,
     task_service: TaskService = Depends(providers.task_service_provider),
 ):
-    try:
-        task_service.delete_existing_task(task_id=task_id)
-    except existence.DoesNotExistError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Task does not exist",
-        )
+    task_service.delete_existing_task(task_id=task_id)
     return {"message": "Task has been deleted"}
 
 
