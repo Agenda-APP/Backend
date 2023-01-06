@@ -2,7 +2,7 @@ from src.database.models import task
 from src.database.repositories.category import CategoryRepository
 from src.database.repositories.task import TaskRepository
 from src.business_logic.dto.task import TaskDTO
-from src.business_logic.errors import existence
+from src.business_logic.exceptions import existence
 
 
 class TaskService:
@@ -14,14 +14,16 @@ class TaskService:
         self.task_repository = task_repository
         self.category_repository = category_repository
 
-    def create_new_task(self, task_dto: TaskDTO) -> None:
+    def create_new_task(self, task_dto: TaskDTO) -> int | None:
         if self.category_repository is not None:
             category_id = self.category_repository.get_id_of_category(
                 task_dto.category.name
             )
             if category_id is None:
-                raise existence.DoesNotExistError("The category does not exist")
-            self.task_repository.create_task(
+                raise existence.DoesNotExistError(
+                    "The category does not exist"
+                )
+            return self.task_repository.create_task(
                 task_dto,
                 category_id=category_id,
             )

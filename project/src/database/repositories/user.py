@@ -17,7 +17,11 @@ class UserRepository(AbstractRepository):
         return self.session.execute(query).scalar()
 
     def create_user(
-        self, email: str, password: str, name: str, photo: str | None = None
+        self,
+        email: str,
+        password: str,
+        name: str | None,
+        photo: str | None = None,
     ) -> None:
         hashed_password = Authorization().get_hashed_password(password)
         query = sqlalchemy.insert(user.Profile).values(

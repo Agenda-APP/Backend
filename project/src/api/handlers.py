@@ -2,7 +2,7 @@ from fastapi import status
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
-from src.business_logic.errors import existence, validation
+from src.business_logic.exceptions import existence, validation
 
 
 def already_exists_handler(

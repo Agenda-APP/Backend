@@ -3,10 +3,11 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.business_logic import handlers
-from src.business_logic.errors import existence, validation
+from src.api import handlers
+from src.business_logic.exceptions import existence, validation
 from src.business_logic import providers
-from src.controllers import authorization, category, task
+from src.api.controllers import category
+from src.api.controllers import task, authorization
 from src.database.dependency import get_database_session_factory
 from src.database.provider import DatabaseProvider
 

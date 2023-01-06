@@ -10,7 +10,7 @@ def test_create_task(client, session, created_category, daily_task):
 
 
 def test_delete_task(client, session, created_category, daily_task):
-    response = client.delete(url="api/task/delete/1")
+    response = client.delete(url="api/task/1")
     assert response.status_code == status.HTTP_200_OK
     assert session.query(func.count(Task.description)).scalar() == 0
 
@@ -23,7 +23,7 @@ def test_update_task(client, session, created_category, daily_task):
         "category": {"name": "Основные"},
         "priority": "Срочно сделать",
     }
-    response = client.put("/api/task/update/1", json=updated_task)
+    response = client.put("/api/task/1", json=updated_task)
     assert response.status_code == status.HTTP_200_OK
     assert session.query(
         exists().where(Task.description == updated_task.get("description"))

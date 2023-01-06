@@ -10,6 +10,6 @@ def test_create_category(client, session, created_category):
 
 
 def test_delete_category(client, session, created_category):
-    response = client.delete(url="api/category/delete/1")
+    response = client.delete(url="api/category/1")
     assert response.status_code == status.HTTP_200_OK
     assert session.query(func.count(Category.name)).scalar() == 0

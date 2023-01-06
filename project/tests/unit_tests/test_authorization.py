@@ -29,9 +29,11 @@ def test_sign_up_with_already_existent_email(client):
 
 def test_login(client):
     user = {"email": "test@mail.com", "password": "12345", "name": "John"}
-    r = client.post(url="api/authorization/signup", data=user)
-    response = client.post(url="api/authorization/login",
-                           json={"email": "test@mail.com", "password": "12345"})
+    client.post(url="api/authorization/signup", data=user)
+    response = client.post(
+        url="api/authorization/login",
+        json={"email": "test@mail.com", "password": "12345"},
+    )
     assert response.status_code == status.HTTP_201_CREATED
     assert len(response.json()) == 3
     assert "access_token" in response.json()

@@ -15,17 +15,23 @@ class TaskRepository(AbstractRepository):
         self,
         task_dto: TaskDTO,
         category_id: int | None,
-    ) -> None:
-        query = sqlalchemy.insert(task.Task).values(
-            user_id=task_dto.user_id,
-            description=task_dto.description,
-            category_id=category_id,
-            status=task_dto.status,
-            priority=task_dto.priority,
-            end_date=task_dto.end_date,
+    ) -> int | None:
+        query = (
+            sqlalchemy.insert(task.Task)
+            .values(
+                user_id=task_dto.user_id,
+                description=task_dto.description,
+                category_id=category_id,
+                status=task_dto.status,
+                priority=task_dto.priority,
+                end_date=task_dto.end_date,
+            )
+            .returning(task.Task.id)
         )
-        self.session.execute(query)
+        result = self.session.execute(query)
         self.session.commit()
+        task_id = result.scalar()
+        return task_id
 
     def delete_task(self, task_id: int) -> None:
         query = sqlalchemy.delete(task.Task).where(task.Task.id == task_id)

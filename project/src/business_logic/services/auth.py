@@ -1,10 +1,8 @@
-from fastapi import UploadFile
-
 from src import utilities
 from src.database.repositories.user import UserRepository
 from src.business_logic.authorization import Authorization
-from src.business_logic.errors import validation
-from src.business_logic.errors import existence
+from src.business_logic.exceptions import validation
+from src.business_logic.exceptions import existence
 from src.business_logic.dto.user import UserDTO
 
 
@@ -14,6 +12,7 @@ class AuthService:
 
     def register_user(self, user_dto: UserDTO) -> dict:
         user_from_db = self.repository.get_user_by_email(email=user_dto.email)
+        user_info = {"email": user_dto.email, "name": user_dto.name}
         if user_from_db:
             raise existence.AlreadyExistsError("The user already exists")
         if user_dto.photo is not None:
@@ -24,17 +23,14 @@ class AuthService:
                 password=user_dto.password,
                 photo=user_dto.photo.filename,
             )
-            return {
-                "email": user_dto.email,
-                "name": user_dto.name,
-                "photo_url": photo_url,
-            }
+            user_info["photo_url"] = photo_url
+            return user_info
         self.repository.create_user(
             email=user_dto.email,
             name=user_dto.name,
             password=user_dto.password,
         )
-        return {"email": user_dto.email, "name": user_dto.name}
+        return user_info
 
     def login_user(self, user_dto: UserDTO) -> dict:
         auth = Authorization()

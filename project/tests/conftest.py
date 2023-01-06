@@ -6,9 +6,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from src.business_logic.errors import existence, validation
-from src.business_logic import handlers
-from src.controllers import authorization, category, task
+from src.business_logic.exceptions import existence, validation
+from src.api import handlers
+from src.api.controllers import category
+from src.api.controllers import task, authorization
 from src.database.dependency import get_database_session_factory
 from src.database.models import base
 
@@ -73,7 +74,7 @@ def photo():
 @pytest.fixture
 def created_category(client):
     new_category = {"name": "Основные"}
-    response = client.post(url="api/category/create", json=new_category)
+    response = client.post(url="api/category", json=new_category)
     return response
 
 
@@ -87,5 +88,5 @@ def daily_task(client):
         "priority": "Срочно сделать",
         "end_date": "2022-12-03T16:28:08.464Z",
     }
-    response = client.post(url="api/task/create", json=daily)
+    response = client.post(url="api/task", json=daily)
     return response

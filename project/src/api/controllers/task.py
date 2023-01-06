@@ -2,21 +2,28 @@ from fastapi import APIRouter, Depends, status
 
 from src.business_logic import providers
 from src.business_logic.dto.task import CategoryDTO, TaskDTO
-from src.business_logic.schemas.task import TaskCreation, TasksRead, TaskUpdate
+from src.api.schemas.task import (
+    TaskCreation,
+    TasksRead,
+    TaskUpdate,
+    TaskCreatedRead,
+)
 from src.business_logic.services.task import TaskService
 
 
-router = APIRouter(prefix="/api/task", tags=["task"])
+router = APIRouter(tags=["task"])
 
 
 @router.post(
-    "/create", status_code=status.HTTP_201_CREATED, response_model=TaskCreation
+    "/api/task",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TaskCreatedRead,
 )
 def create_task(
     task: TaskCreation,
     task_service: TaskService = Depends(providers.task_service_provider),
 ):
-    task_service.create_new_task(
+    task_id = task_service.create_new_task(
         TaskDTO(
             status=task.status,
             end_date=task.end_date,
@@ -25,10 +32,10 @@ def create_task(
             priority=task.priority,
         )
     )
-    return task
+    return {**task.dict(), "id": task_id}
 
 
-@router.delete("/delete/{task_id}", status_code=status.HTTP_200_OK)
+@router.delete("/api/task/{task_id}", status_code=status.HTTP_200_OK)
 def delete_task(
     task_id: int,
     task_service: TaskService = Depends(providers.task_service_provider),
@@ -38,7 +45,7 @@ def delete_task(
 
 
 @router.put(
-    "/update/{task_id}",
+    "/api/task/{task_id}",
     status_code=status.HTTP_200_OK,
     response_model=TasksRead,
 )

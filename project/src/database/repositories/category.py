@@ -11,10 +11,16 @@ class CategoryRepository(AbstractRepository):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def create_category(self, name: str) -> None:
-        query = sqlalchemy.insert(task.Category).values(name=name)
-        self.session.execute(query)
+    def create_category(self, name: str) -> int | None:
+        query = (
+            sqlalchemy.insert(task.Category)
+            .values(name=name)
+            .returning(task.Category.id)
+        )
+        result = self.session.execute(query)
         self.session.commit()
+        category_id = result.scalar()
+        return category_id
 
     def get_id_of_category(self, name: str | CategoryDTO) -> int | None:
         query = sqlalchemy.select(task.Category.id).where(

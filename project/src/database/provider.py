@@ -1,4 +1,7 @@
-from src.database.connection import create_database_engine, create_session_factory
+from src.database.connection import (
+    create_database_engine,
+    create_session_factory,
+)
 
 
 class DatabaseProvider:
