@@ -3,10 +3,13 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from database.dependency import get_database_session_factory
-from database.provider import DatabaseProvider
-from src import providers
-from src.handlers import authorization, category, task
+from src.api import handlers
+from src.business_logic.exceptions import existence, validation
+from src.business_logic import providers
+from src.api.controllers import category
+from src.api.controllers import task, authorization
+from src.database.dependency import get_database_session_factory
+from src.database.provider import DatabaseProvider
 
 
 def configure_database(app: FastAPI) -> None:
@@ -26,7 +29,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Task Book", description="Convenient task management service"
     )
-    app.mount("/static", StaticFiles(directory="static"), name="static")
+    app.mount("/static", StaticFiles(directory="src/static"), name="static")
     app.dependency_overrides[
         providers.task_service_factory
     ] = providers.task_service_provider
@@ -36,6 +39,15 @@ def create_app() -> FastAPI:
     app.dependency_overrides[
         providers.auth_service_factory
     ] = providers.auth_service_provider
+    app.add_exception_handler(
+        existence.AlreadyExistsError, handlers.already_exists_handler
+    )
+    app.add_exception_handler(
+        existence.DoesNotExistError, handlers.does_not_exist_handler
+    )
+    app.add_exception_handler(
+        validation.IncorrectDataError, handlers.incorrect_data_handler
+    )
     configure_database(app)
     configure_routes(app)
     return app
