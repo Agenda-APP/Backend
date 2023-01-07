@@ -1,9 +1,12 @@
+import os
+
 from src import utilities
 from src.database.repositories.user import UserRepository
-from src.business_logic.authorization import Authorization
+from src.business_logic.classes.authentication import Authentication
 from src.business_logic.exceptions import validation
 from src.business_logic.exceptions import existence
 from src.business_logic.dto.user import UserDTO
+from src.business_logic.classes.jwt_manager import JWTManager
 
 
 class AuthService:
@@ -33,14 +36,16 @@ class AuthService:
         return user_info
 
     def login_user(self, user_dto: UserDTO) -> dict:
-        auth = Authorization()
+        jwt_manager = JWTManager(int(os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"]),
+                                 os.environ["SECRET"],
+                                 os.environ["ALGORITHM"])
         user_from_db = self.repository.get_user_by_email(email=user_dto.email)
         if user_from_db is None:
             raise existence.DoesNotExistError("User does not exist")
-        verified_password = auth.verify_password(
+        verified_password = Authentication().verify_password(
             user_dto.password, user_from_db.password
         )
         if not verified_password:
             raise validation.IncorrectDataError("Incorrect email or password")
-        access_token = auth.create_access_token(user_dto.email)
+        access_token = jwt_manager.create_access_token(user_dto.email)
         return {"email": user_dto.email, "access_token": access_token}
