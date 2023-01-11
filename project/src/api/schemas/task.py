@@ -27,7 +27,7 @@ class TaskCreatedRead(TaskBase):
 class TasksRead(TaskBase):
     id: int
     user_id: int | None
-    category: Category
+    category: Category | None
 
     class Config:
         orm_mode = True
@@ -35,3 +35,11 @@ class TasksRead(TaskBase):
 
 class TaskUpdate(TaskBase):
     category: Category
+
+
+class AllTasksRead(TaskBase):
+    user_id: int
+    id: int
+
+    class Config:
+        orm_mode = True

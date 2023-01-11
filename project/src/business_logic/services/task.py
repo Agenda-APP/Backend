@@ -4,6 +4,8 @@ from src.database.repositories.task import TaskRepository
 from src.business_logic.dto.task import TaskDTO
 from src.business_logic.exceptions import existence
 
+from src.database.models.task import Task
+
 
 class TaskService:
     def __init__(
@@ -40,6 +42,8 @@ class TaskService:
             category_id = self.category_repository.get_id_of_category(
                 task_dto.category.name
             )
+            if category_id is None:
+                raise existence.DoesNotExistError("Category does not exist")
             updated_task = self.task_repository.update_task(
                 task_id=task_id,
                 category_id=category_id,
@@ -47,3 +51,9 @@ class TaskService:
             )
             return updated_task
         return None
+
+    def get_active_tasks_of_user(self, user_id: int) -> list[Task]:
+        return self.task_repository.get_all_active_tasks_of_user(user_id)
+
+    def get_done_tasks_of_user(self, user_id: int) -> list[Task]:
+        return self.task_repository.get_all_done_tasks_of_user(user_id)

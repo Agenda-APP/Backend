@@ -79,7 +79,17 @@ def created_category(client):
 
 
 @pytest.fixture
-def daily_task(client):
+def user(client):
+    user_info = {
+        "email": "test@mail.ru",
+        "password": "somepassword",
+        "name": "John"
+    }
+    client.post(url="api/authorization/signup", data=user_info)
+
+
+@pytest.fixture
+def daily_task(client, user):
     daily = {
         "user_id": 1,
         "description": "Пойти в магазин",

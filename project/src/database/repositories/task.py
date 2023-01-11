@@ -2,9 +2,10 @@ import sqlalchemy
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql import exists
 
-from src.database.models import task
+from src.database.models.task import Task
 from src.business_logic.dto.task import TaskDTO
 from .repository import AbstractRepository
+from src.enumerations import Status
 
 
 class TaskRepository(AbstractRepository):
@@ -17,7 +18,7 @@ class TaskRepository(AbstractRepository):
         category_id: int | None,
     ) -> int | None:
         query = (
-            sqlalchemy.insert(task.Task)
+            sqlalchemy.insert(Task)
             .values(
                 user_id=task_dto.user_id,
                 description=task_dto.description,
@@ -26,7 +27,7 @@ class TaskRepository(AbstractRepository):
                 priority=task_dto.priority,
                 end_date=task_dto.end_date,
             )
-            .returning(task.Task.id)
+            .returning(Task.id)
         )
         result = self.session.execute(query)
         self.session.commit()
@@ -34,16 +35,16 @@ class TaskRepository(AbstractRepository):
         return task_id
 
     def delete_task(self, task_id: int) -> None:
-        query = sqlalchemy.delete(task.Task).where(task.Task.id == task_id)
+        query = sqlalchemy.delete(Task).where(Task.id == task_id)
         self.session.execute(query)
         self.session.commit()
 
     def update_task(
         self, task_id: int, category_id: int | None, existing_task: TaskDTO
-    ) -> task.Task | None:
+    ) -> Task | None:
         query = (
-            sqlalchemy.update(task.Task)
-            .where(task.Task.id == task_id)
+            sqlalchemy.update(Task)
+            .where(Task.id == task_id)
             .values(
                 description=existing_task.description,
                 category_id=category_id,
@@ -55,13 +56,21 @@ class TaskRepository(AbstractRepository):
         self.session.execute(query)
         self.session.commit()
         updated = self.session.execute(
-            sqlalchemy.select(task.Task)
-            .where(task.Task.id == task_id)
-            .options(joinedload(task.Task.category))
+            sqlalchemy.select(Task)
+            .where(Task.id == task_id)
+            .options(joinedload(Task.category))
         )
         return updated.scalar()
 
     def is_exists(self, task_id: int) -> bool:
         return self.session.query(
-            exists().where(task.Task.id == task_id)
+            exists().where(Task.id == task_id)
         ).scalar()
+
+    def get_all_active_tasks_of_user(self, user_id: int) -> list[Task]:
+        query = sqlalchemy.select(Task).where((Task.user_id == user_id) & (Task.status == Status.CREATED))
+        return self.session.execute(query).scalars().all()
+
+    def get_all_done_tasks_of_user(self, user_id: int) -> list[Task]:
+        query = sqlalchemy.select(Task).where((Task.user_id == user_id) & (Task.status == Status.DONE))
+        return self.session.execute(query).scalars().all()
