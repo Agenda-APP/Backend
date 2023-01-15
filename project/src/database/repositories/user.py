@@ -22,10 +22,12 @@ class UserRepository(AbstractRepository):
         password: str,
         name: str | None,
         photo: str | None = None,
-    ) -> None:
+    ) -> int:
         hashed_password = Authentication().get_hashed_password(password)
         query = sqlalchemy.insert(user.Profile).values(
             email=email, password=hashed_password, name=name, photo=photo
-        )
-        self.session.execute(query)
+        ).returning(user.Profile.id)
+        result = self.session.execute(query)
         self.session.commit()
+        user_id = result.scalar_one()
+        return user_id

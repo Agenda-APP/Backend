@@ -11,7 +11,7 @@ class CategoryRepository(AbstractRepository):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def create_category(self, name: str) -> int | None:
+    def create_category(self, name: str) -> int:
         query = (
             sqlalchemy.insert(task.Category)
             .values(name=name)
@@ -19,7 +19,7 @@ class CategoryRepository(AbstractRepository):
         )
         result = self.session.execute(query)
         self.session.commit()
-        category_id = result.scalar()
+        category_id = result.scalar_one()
         return category_id
 
     def get_id_of_category(self, name: str | CategoryDTO) -> int | None:

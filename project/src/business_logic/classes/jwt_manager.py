@@ -21,10 +21,9 @@ class JWTManager:
 
     def decode_token(self, token: str) -> None:
         try:
-            payload = jwt.decode(
+            jwt.decode(
                 token, self.secret, algorithms=[self.algorithm]
             )
-            return payload["sub"]
         except jwt.ExpiredSignatureError:
             raise HTTPException(
                 status_code=401, detail="Signature has expired"

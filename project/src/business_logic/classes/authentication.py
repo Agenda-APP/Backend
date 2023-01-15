@@ -32,4 +32,4 @@ class Authentication:
         self, jwt_manager: JWTManager = Depends(provide_jwt_manager_instance),
             auth: HTTPAuthorizationCredentials = Security(HTTPBearer())
     ) -> None:
-        return jwt_manager.decode_token(auth.credentials)
+        jwt_manager.decode_token(auth.credentials)

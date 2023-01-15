@@ -20,19 +20,21 @@ class AuthService:
             raise existence.AlreadyExistsError("The user already exists")
         if user_dto.photo is not None:
             photo_url = utilities.save_photo(user_dto.photo)
-            self.repository.create_user(
+            user_id = self.repository.create_user(
                 email=user_dto.email,
                 name=user_dto.name,
                 password=user_dto.password,
                 photo=user_dto.photo.filename,
             )
             user_info["photo_url"] = photo_url
+            user_info["user_id"] = user_id
             return user_info
-        self.repository.create_user(
+        user_id = self.repository.create_user(
             email=user_dto.email,
             name=user_dto.name,
             password=user_dto.password,
         )
+        user_info["user_id"] = user_id
         return user_info
 
     def login_user(self, user_dto: UserDTO) -> dict:

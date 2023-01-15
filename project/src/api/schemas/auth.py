@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class SignUpDetails(BaseModel):
+    user_id: int
     message: str
     email: str
     name: str
