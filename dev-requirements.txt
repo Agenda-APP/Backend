@@ -11,6 +11,7 @@ pyjwt
 passlib[bcrypt]
 
 #database
+psycopg2-binary
 alembic==1.7.7
 
 #formatters and checkers
