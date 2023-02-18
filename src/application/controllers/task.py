@@ -19,7 +19,7 @@ router = APIRouter(tags=["task"])
     "/api/task",
     status_code=status.HTTP_201_CREATED,
     response_model=TaskCreatedRead,
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def create_task(
     task: TaskCreation,
@@ -41,7 +41,7 @@ def create_task(
 @router.delete(
     "/api/task/{task_id}",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def delete_task(
     task_id: int,
@@ -55,7 +55,7 @@ def delete_task(
     "/api/task/{task_id}",
     status_code=status.HTTP_200_OK,
     response_model=TasksRead,
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def update_task(
     task_id: int,
@@ -80,7 +80,7 @@ def update_task(
     "/api/tasks/active/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=list[AllTasksRead],
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def get_active_tasks(
     user_id: int,
@@ -93,7 +93,7 @@ def get_active_tasks(
     "/api/tasks/done/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=list[AllTasksRead],
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def get_done_tasks(
     user_id: int,

@@ -11,7 +11,7 @@ router = APIRouter(tags=["category"])
 @router.post(
     "/api/category",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def create_category(
     category: CategoryCreation,
@@ -30,7 +30,7 @@ def create_category(
 @router.delete(
     "/api/category/{category_id}",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(dependencies.check_auth())]
+    dependencies=[Depends(dependencies.check_auth())],
 )
 def delete_category(
     category_id: int,

@@ -14,9 +14,9 @@ class TaskRepository(AbstractRepository):
         super().__init__(session)
 
     def create_task(
-            self,
-            task_dto: TaskDTO,
-            category_id: int | None,
+        self,
+        task_dto: TaskDTO,
+        category_id: int | None,
     ) -> int | None:
         query = (
             sa.insert(Task)
@@ -41,8 +41,8 @@ class TaskRepository(AbstractRepository):
         self.session.commit()
 
     def update_task(
-            self, task_id: int, category_id: int | None, existing_task: TaskDTO
-    ) -> Row | None:  # TODO закоммитить изменения
+        self, task_id: int, category_id: int | None, existing_task: TaskDTO
+    ) -> Row | None:
         query = (
             sa.update(Task)
             .where(Task.id == task_id)
@@ -56,11 +56,18 @@ class TaskRepository(AbstractRepository):
         )
         self.session.execute(query)
         self.session.commit()
-        updated_task_query = (sa.select(Task.user_id, Task.status, Task.end_date,
-                       Task.description, Category.name.label("category"),
-                       Task.priority)
-             .join(Category)
-             .where(Task.id == task_id))
+        updated_task_query = (
+            sa.select(
+                Task.user_id,
+                Task.status,
+                Task.end_date,
+                Task.description,
+                Category.name.label("category"),
+                Task.priority,
+            )
+            .join(Category)
+            .where(Task.id == task_id)
+        )
         updated_task = self.session.execute(updated_task_query).first()
         return updated_task
 
