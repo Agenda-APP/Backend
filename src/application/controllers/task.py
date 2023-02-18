@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 
 from application import providers
-from business_logic.dto.task import CategoryDTO, TaskDTO
+from business_logic.dto.task import TaskDTO
 from application.schemas.task import (
     TaskCreation,
     TasksRead,
@@ -31,7 +31,7 @@ def create_task(
             status=task.status,
             end_date=task.end_date,
             description=task.description,
-            category=CategoryDTO(task.category),
+            category=task.category,
             priority=task.priority,
         )
     )
@@ -60,10 +60,11 @@ def update_task(
     updated_task = task_service.update_existing_task(
         task_id,
         TaskDTO(
+            user_id=task.user_id,
             status=task.status,
             end_date=task.end_date,
             description=task.description,
-            category=CategoryDTO(task.category.name),
+            category=task.category,
             priority=task.priority,
         ),
     )
@@ -74,7 +75,7 @@ def update_task(
     "/api/tasks/active/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=list[AllTasksRead],
-    dependencies=[Depends(Authentication().requires_authentication)],
+    dependencies=[Depends(Authentication().requires_authentication)]
 )
 def get_active_tasks(
     user_id: int,

@@ -1,6 +1,5 @@
 from business_logic.dto.task import TaskDTO
 from business_logic.exceptions import existence
-from database.models import task
 from database.models.task import Task
 from database.repositories.category import CategoryRepository
 from database.repositories.task import TaskRepository
@@ -18,16 +17,17 @@ class TaskService:
     def create_new_task(self, task_dto: TaskDTO) -> int | None:
         if self.category_repository is not None:
             category_id = self.category_repository.get_id_of_category(
-                task_dto.category.name
+                task_dto.category
             )
             if category_id is None:
                 raise existence.DoesNotExistError(
                     "The category does not exist"
                 )
-            return self.task_repository.create_task(
+            task_id = self.task_repository.create_task(
                 task_dto,
                 category_id=category_id,
             )
+            return task_id
         return None
 
     def delete_existing_task(self, task_id: int) -> None:
@@ -37,10 +37,10 @@ class TaskService:
 
     def update_existing_task(
         self, task_id: int, task_dto: TaskDTO
-    ) -> task.Task | None:
+    ) -> TaskDTO | None:
         if self.category_repository is not None:
             category_id = self.category_repository.get_id_of_category(
-                task_dto.category.name
+                task_dto.category
             )
             if category_id is None:
                 raise existence.DoesNotExistError("Category does not exist")
@@ -49,7 +49,7 @@ class TaskService:
                 category_id=category_id,
                 existing_task=task_dto,
             )
-            return updated_task
+            return TaskDTO(*updated_task)
         return None
 
     def get_active_tasks_of_user(self, user_id: int) -> list[Task]:

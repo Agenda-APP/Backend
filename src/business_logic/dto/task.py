@@ -11,9 +11,9 @@ class CategoryDTO:
 
 @dataclass
 class TaskDTO:
+    user_id: int
     status: Status
     end_date: datetime
     description: str
-    category: CategoryDTO
+    category: str
     priority: Priority
-    user_id: int | None = None

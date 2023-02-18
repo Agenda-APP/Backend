@@ -17,10 +17,11 @@ def test_delete_task(client, session, daily_task):
 
 def test_update_task(client, session, daily_task):
     updated_task = {
+        "user_id": 1,
         "status": "Создано",
         "end_date": "2022-12-27T12:10:03.500Z",
         "description": "Пойти в ресторан",
-        "category": {"name": "Основные"},
+        "category": "Основные",
         "priority": "Срочно сделать",
     }
     response = client.put("/api/task/1", json=updated_task)
