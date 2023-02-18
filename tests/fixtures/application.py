@@ -1,8 +1,5 @@
-import os
-
 import pytest
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.testclient import TestClient
 
 from application import handlers
@@ -40,9 +37,9 @@ def client(app):
 
 
 @pytest.fixture
-def created_category(client):
+def created_category(client, token):
     new_category = {"name": "Основные"}
-    response = client.post(url="api/category", json=new_category)
+    response = client.post(url="api/category", json=new_category, headers={"Authorization": f"Bearer {token}"})
     return response
 
 
@@ -57,7 +54,7 @@ def user(client):
 
 
 @pytest.fixture
-def daily_task(client, user, created_category):
+def daily_task(client, user, created_category, token):
     daily = {
         "user_id": 1,
         "description": "Пойти в магазин",
@@ -66,12 +63,12 @@ def daily_task(client, user, created_category):
         "priority": "Срочно сделать",
         "end_date": "2022-12-03T16:28:08.464Z",
     }
-    response = client.post(url="api/task", json=daily)
+    response = client.post(url="api/task", json=daily, headers={"Authorization": f"Bearer {token}"})
     return response
 
 
 @pytest.fixture
-def authorized_user(client):
+def token(client):
     user_info = {
         "email": "test@mail.ru",
         "password": "somepassword",
@@ -80,11 +77,12 @@ def authorized_user(client):
     login_info = {"email": "test@mail.ru", "password": "somepassword"}
     client.post(url="api/authorization/signup", data=user_info)
     response = client.post(url="api/authorization/login", json=login_info)
-    return response.json()
+    access_token = response.json()["access_token"]
+    return access_token
 
 
 @pytest.fixture
-def done_task(client, user, created_category):
+def done_task(client, user, created_category, token):
     daily = {
         "user_id": 1,
         "description": "Пойти в магазин",
@@ -93,5 +91,5 @@ def done_task(client, user, created_category):
         "priority": "Срочно сделать",
         "end_date": "2022-12-03T16:28:08.464Z",
     }
-    response = client.post(url="api/task", json=daily)
+    response = client.post(url="api/task", json=daily, headers={"Authorization": f"Bearer {token}"})
     return response

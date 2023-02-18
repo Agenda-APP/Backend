@@ -9,7 +9,7 @@ def test_create_category(client, session, created_category):
     assert session.query(exists().where(Category.name == "Основные")).scalar()
 
 
-def test_delete_category(client, session, created_category):
-    response = client.delete(url="api/category/1")
+def test_delete_category(client, session, created_category, token):
+    response = client.delete(url="api/category/1", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == status.HTTP_200_OK
     assert session.query(func.count(Category.name)).scalar() == 0

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from application import providers
+from application import providers, dependencies
 from application.schemas.category import CategoryCreation
 from application.services.category import CategoryService
 
@@ -8,7 +8,11 @@ from application.services.category import CategoryService
 router = APIRouter(tags=["category"])
 
 
-@router.post("/api/category", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/api/category",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(dependencies.check_auth())]
+)
 def create_category(
     category: CategoryCreation,
     category_service: CategoryService = Depends(
@@ -23,7 +27,11 @@ def create_category(
     }
 
 
-@router.delete("/api/category/{category_id}", status_code=status.HTTP_200_OK)
+@router.delete(
+    "/api/category/{category_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(dependencies.check_auth())]
+)
 def delete_category(
     category_id: int,
     category_service: CategoryService = Depends(
