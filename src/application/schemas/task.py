@@ -3,7 +3,6 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from enumerations import Priority, Status
-from application.schemas.category import Category
 
 
 class TaskBase(BaseModel):
@@ -25,16 +24,16 @@ class TaskCreatedRead(TaskBase):
 
 
 class TasksRead(TaskBase):
-    id: int
     user_id: int | None
-    category: Category | None
+    category: str | None
 
     class Config:
         orm_mode = True
 
 
 class TaskUpdate(TaskBase):
-    category: Category
+    user_id: int
+    category: str
 
 
 class AllTasksRead(TaskBase):
